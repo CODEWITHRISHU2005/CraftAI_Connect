@@ -1,16 +1,18 @@
 package com.CODEWITHRISHU.CraftAI_Connect.entity;
 
 import com.CODEWITHRISHU.CraftAI_Connect.dto.ProductStatus;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -25,43 +27,48 @@ public class Product extends AuditEntity {
     private Long id;
 
     @NotBlank
-    private String tittle;
-
-    @NotBlank
-    private String name;
+    @Size(max = 100)
+    @Column(name = "product_name", nullable = false)
+    private String productName;
 
     @Column(length = 2000, columnDefinition = "TEXT")
-    private String description;
+    private String baseDescription;
 
-    @Column(length = 5000, columnDefinition = "TEXT")
-    private String aiStory;
+    @Column(length = 3000, columnDefinition = "TEXT")
+    private String generatedDescription;
 
-    @NotBlank
-    private String category;
+    private Set<String> category;
 
     @NotNull
-    @DecimalMin("0.0")
-    private Double price;
+    @DecimalMin(value = "0.0", inclusive = false)
+    private BigDecimal price;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artisan_id", nullable = false)
+    private Artisian artisan;
+
+    @Column(name = "material")
+    private Set<String> materials = new HashSet<>();
+
+    private Set<String> techniques = new HashSet<>();
+
+    @Column(name = "image_url")
+    private Set<String> imageUrls = new HashSet<>();
 
     @Column(name = "stock_quantity")
     private Integer stockQuantity = 1;
 
-    @ElementCollection
-    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "image_url")
-    private List<String> images = new ArrayList<>();
+    @Column(name = "weight_grams")
+    private Integer weightGrams;
 
-    @ElementCollection
-    @CollectionTable(name = "product_tags", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "tag")
-    private List<String> tags = new ArrayList<>();
+    @Size(max = 500)
+    @Column(name = "dimensions")
+    private String dimensions;
 
     @Enumerated(EnumType.STRING)
-    private ProductStatus status = ProductStatus.DRAFT;
+    @Column(name = "status")
+    private ProductStatus status = ProductStatus.ACTIVE;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    @JsonIgnore
-    private User user;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Story> stories = new ArrayList<>();
 }
-

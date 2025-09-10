@@ -1,0 +1,10 @@
+package com.CODEWITHRISHU.CraftAI_Connect.dto;
+
+public enum StoryType {
+    ARTISAN_BIOGRAPHY,
+    CRAFT_HISTORY,
+    PRODUCT_STORY,
+    TECHNIQUE_EXPLANATION,
+    CULTURAL_HERITAGE,
+    CREATION_PROCESS
+}

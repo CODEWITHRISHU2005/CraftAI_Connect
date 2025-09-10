@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 public final class ObjectMapper {
     private ObjectMapper() {
+        throw new UnsupportedOperationException("Utility class");
     }
 
     public static AIStoryResponse parseAIStoryResponse(String jsonResponse) {

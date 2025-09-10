@@ -1,5 +1,5 @@
 package com.CODEWITHRISHU.CraftAI_Connect.dto;
 
 public enum ProductStatus {
-    DRAFT, ACTIVE, INACTIVE, SOLD
+    ACTIVE, INACTIVE, OUT_OF_STOCK, DISCONTINUED
 }

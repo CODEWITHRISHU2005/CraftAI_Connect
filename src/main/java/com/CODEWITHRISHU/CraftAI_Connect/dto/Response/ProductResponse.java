@@ -5,15 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AIStoryResponse {
-    private String story;
-    private String tittle;
-    private List<String> suggestedTags;
+public class ProductResponse {
+    private Long id;
+    private String name;
     private String description;
+    private Double price;
+    private String category;
+    private String imageUrl;
+    private Integer stockQuantity;
+    private String aiStory;
 }

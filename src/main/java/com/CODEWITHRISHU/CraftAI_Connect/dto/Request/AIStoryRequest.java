@@ -1,13 +1,9 @@
 package com.CODEWITHRISHU.CraftAI_Connect.dto.Request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class AIStoryRequest {
     @NotBlank
     private String productName;

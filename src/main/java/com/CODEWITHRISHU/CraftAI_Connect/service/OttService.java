@@ -40,7 +40,7 @@ public class OttService {
     @Transactional(rollbackFor = SQLException.class)
     public void generateMagicLink(String username) {
         log.info("Generating magic link for user: {}", username);
-        User user = userRepository.findByName(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
                     log.warn("User not found: {}", username);
                     return new IllegalArgumentException("User not found: " + username);

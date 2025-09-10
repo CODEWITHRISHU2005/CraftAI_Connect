@@ -23,7 +23,7 @@ public class RefreshTokenService {
 
     public RefreshToken createRefreshToken(String username) {
         log.info("Creating refresh token for user: {}", username);
-        User user = userRepository.findByName(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
                     log.warn("User not found: {}", username);
                     return new UsernameNotFoundException("User not found");

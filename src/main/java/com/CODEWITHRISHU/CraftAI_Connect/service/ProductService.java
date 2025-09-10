@@ -4,11 +4,14 @@ import com.CODEWITHRISHU.CraftAI_Connect.dto.ProductStatus;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.Request.AIStoryRequest;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.Request.ProductRequest;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.Response.AIStoryResponse;
+import com.CODEWITHRISHU.CraftAI_Connect.dto.Response.ProductResponse;
 import com.CODEWITHRISHU.CraftAI_Connect.entity.Product;
 import com.CODEWITHRISHU.CraftAI_Connect.entity.User;
 import com.CODEWITHRISHU.CraftAI_Connect.repository.ProductRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -80,4 +83,18 @@ public class ProductService {
         return savedProduct;
     }
 
+    public void deleteProduct(Long id, User user) {
+    }
+
+    public Product uploadProductImages(Long id, User user, MultipartFile[] files) {
+    }
+
+    public List<String> getAllCategories() {
+    }
+
+    public List<ProductResponse> getAllActiveProducts() {
+    }
+
+    public Product updateProduct(Long id, User user, @Valid ProductRequest request) {
+    }
 }

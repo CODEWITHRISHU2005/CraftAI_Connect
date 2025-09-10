@@ -1,5 +1,6 @@
 package com.CODEWITHRISHU.CraftAI_Connect.entity;
 
+import com.CODEWITHRISHU.CraftAI_Connect.dto.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -18,37 +19,35 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class User extends AuditEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(max = 50)
+    @Column(unique = true, nullable = false)
+    private String username;
+
     @Email
     @NotBlank
-    @Column(unique = true)
+    @Size(max = 100)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @JsonIgnore
     @NotBlank
-    @Size(min = 6)
+    @Size(min = 6, max = 120)
     private String password;
 
     @NotBlank
-    private String name;
+    @Size(max = 50)
+    private String fullName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role = Role.CUSTOMER;
 
     @Embedded
-    private Address address;
-
-    private String craftType;
-    private Integer experienceYears;
-
-    @Column(length = 1000)
-    private String bio;
-
-    private String roles;
-    private Boolean isVerified = false;
-    private Boolean isActive = true;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Product> products = new ArrayList<>();
+    private Address address;
 }
