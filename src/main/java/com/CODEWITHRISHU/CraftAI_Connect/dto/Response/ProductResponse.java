@@ -1,21 +1,20 @@
 package com.CODEWITHRISHU.CraftAI_Connect.dto.Response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.CODEWITHRISHU.CraftAI_Connect.dto.ProductStatus;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class ProductResponse {
-    private Long id;
-    private String name;
-    private String description;
-    private Double price;
-    private String category;
-    private String imageUrl;
-    private Integer stockQuantity;
-    private String aiStory;
+import java.math.BigDecimal;
+import java.util.List;
+
+public record ProductResponse(
+        Long id,
+        String name,
+        String description,
+        String aiGeneratedDescription,
+        BigDecimal price,
+        String category,
+        String materials,
+        List<String> imageUrls,
+        List<String> tags,
+        ProductStatus status
+) {
 }

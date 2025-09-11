@@ -3,7 +3,6 @@ package com.CODEWITHRISHU.CraftAI_Connect.entity;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.ProductStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -26,44 +25,30 @@ public class Product extends AuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 100)
-    @Column(name = "product_name", nullable = false)
-    private String productName;
+    @Column(nullable = false)
+    private String name;
 
-    @Column(length = 2000, columnDefinition = "TEXT")
-    private String baseDescription;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
-    @Column(length = 3000, columnDefinition = "TEXT")
-    private String generatedDescription;
+    @Column(columnDefinition = "TEXT")
+    private String aiGeneratedDescription;
 
-    private Set<String> category;
-
-    @NotNull
-    @DecimalMin(value = "0.0", inclusive = false)
     private BigDecimal price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "artisan_id", nullable = false)
-    private Artisian artisan;
-
-    @Column(name = "material")
-    private Set<String> materials = new HashSet<>();
-
-    private Set<String> techniques = new HashSet<>();
-
-    @Column(name = "image_url")
-    private Set<String> imageUrls = new HashSet<>();
-
-    @Column(name = "stock_quantity")
-    private Integer stockQuantity = 1;
-
-    @Column(name = "weight_grams")
-    private Integer weightGrams;
-
-    @Size(max = 500)
-    @Column(name = "dimensions")
+    private String category;
+    private String materials;
     private String dimensions;
+
+    @ElementCollection
+    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "image_url")
+    private List<String> imageUrls = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "product_tags", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "tag")
+    private List<String> tags = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
@@ -71,4 +56,8 @@ public class Product extends AuditEntity {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Story> stories = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artisan_id", nullable = false)
+    private Artisian artisan;
 }

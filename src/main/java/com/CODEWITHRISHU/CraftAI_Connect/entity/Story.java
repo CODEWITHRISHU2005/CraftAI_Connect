@@ -3,11 +3,9 @@ package com.CODEWITHRISHU.CraftAI_Connect.entity;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.StoryType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "stories")
@@ -15,25 +13,28 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Story extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 200)
-    private String title;
-
-    @Column(length = 5000)
-    private String content;
+    @Size(max = 50)
+    @NotNull
+    @Column(nullable = false)
+    private String tittle;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "story_type")
     private StoryType storyType;
 
+    @Size(max = 500)
+    @Column(columnDefinition = "TEXT")
+    @NotBlank(message = "Content is required")
+    private String content;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "artisan_id")
-    private Artisian artisan;
+    @JoinColumn(name = "artisian_id")
+    private Artisian artisian;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")

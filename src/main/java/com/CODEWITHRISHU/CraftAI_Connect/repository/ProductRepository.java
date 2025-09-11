@@ -9,26 +9,27 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    Page<Product> findByArtisianId(Long artisianId, Pageable pageable);
+    Page<Product> findByArtisanIdAndStatus(Long artisanId, ProductStatus status, Pageable pageable);
 
-    Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
+    @Query("""
+            SELECT p FROM Product p 
+            WHERE (:category IS NULL OR LOWER(p.category) = LOWER(:category))
+            AND (:minPrice IS NULL OR p.price >= :minPrice)
+            AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+            AND p.status = 'ACTIVE'
+            ORDER BY p.createdAt DESC
+            """)
+    Page<Product> findByFilters(
+            @Param("category") String category,
+            @Param("minPrice") BigDecimal minPrice,
+            @Param("maxPrice") BigDecimal maxPrice,
+            Pageable pageable
+    );
 
-    @Query("SELECT p FROM Product p WHERE p.isFeatured = true AND p.status = 'ACTIVE'")
-    List<Product> findFeaturedProducts();
-
-    @Query("SELECT p FROM Product p WHERE " +
-            "(:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
-            "(:categoryId IS NULL OR p.category.id = :categoryId) AND " +
-            "p.status = 'ACTIVE'")
-    Page<Product> searchProducts(@Param("name") String name,
-                                 @Param("categoryId") Long categoryId,
-                                 Pageable pageable);
-
-    @Query("SELECT p FROM Product p WHERE p.status = 'ACTIVE' ORDER BY p.totalSold DESC")
-    List<Product> findBestSellingProducts(Pageable pageable);
-}
+    List<Product> findByArtisianId(Long artisianId);
 }

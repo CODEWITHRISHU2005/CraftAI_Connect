@@ -1,17 +1,12 @@
 package com.CODEWITHRISHU.CraftAI_Connect.entity;
 
+import com.CODEWITHRISHU.CraftAI_Connect.dto.ArtisianStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "artisans")
@@ -19,45 +14,34 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Artisian extends AuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "name is required")
-    @Size(max = 50, message = "name must be at most 50 characters")
-    @Column(name = "artisan_name", nullable = false)
-    private String artisanName;
+    @Column(nullable = false)
+    private String name;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(unique = true, nullable = false)
+    private String email;
 
-    @NotBlank
-    @Size(max = 100)
-    @Column(name = "craft_specialty")
     private String craftSpecialty;
 
-    @Column(name = "bio", length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String bio;
 
-    private String culturalBackground;
-
-    @Column(name = "years_of_experience")
     private Integer yearsOfExperience;
 
-    private Set<String> skills = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    private ArtisianStatus status = ArtisianStatus.ACTIVE;
 
-    @Column(name = "profile_image_url")
     private String profileImageUrl;
 
     @OneToMany(mappedBy = "artisan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
 
-    @OneToMany(mappedBy = "artisan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "artisian", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Story> stories = new ArrayList<>();
-
-    @OneToMany(mappedBy = "artisan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MarketingIdea> marketingIdeas = new ArrayList<>();
 }

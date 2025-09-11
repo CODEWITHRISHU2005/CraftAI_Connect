@@ -1,6 +1,5 @@
 package com.CODEWITHRISHU.CraftAI_Connect.service;
 
-import com.CODEWITHRISHU.CraftAI_Connect.dto.Request.RegisterRequest;
 import com.CODEWITHRISHU.CraftAI_Connect.entity.User;
 import com.CODEWITHRISHU.CraftAI_Connect.exception.UserAlreadyExists;
 import com.CODEWITHRISHU.CraftAI_Connect.repository.UserRepository;
