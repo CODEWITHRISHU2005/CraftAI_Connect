@@ -11,21 +11,23 @@ services:
     depends_on:
         mysql:
           condition: service_healthy
+    env_file:
+      - .env
 
   mysql:
     image: mysql:latest
     container_name: CraftConnect-MySQL
     environment:
-      MYSQL_ROOT_PASSWORD: "RishabhGupta&2005@"
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: CraftConnect
       MYSQL_USER: CraftConnect-MySQL
-      MYSQL_PASSWORD: "RishabhGupta&2005@"
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3307:3306"
     networks:
       - s-network
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-pRishabhGupta&2005@" ]
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}" ]
       interval: 10s
       timeout: 5s
       retries: 5

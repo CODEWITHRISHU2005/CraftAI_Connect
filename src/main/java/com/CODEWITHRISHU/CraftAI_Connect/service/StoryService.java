@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.CODEWITHRISHU.CraftAI_Connect.Utils.ObjectMapper.storyMapper;
 
 @Service
 @Slf4j
@@ -28,6 +27,7 @@ public class StoryService {
     private final ArtisianRepository artisianRepository;
     private final ProductRepository productRepository;
     private final AIContentService aiContentService;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public StoryResponse generateStory(Long artisanId, GenerateStoryRequest request) {
@@ -40,35 +40,34 @@ public class StoryService {
                     .orElseThrow(() -> new RuntimeException("Product not found"));
         }
 
-        String storyContent = aiContentService.generateCraftStory(artisan, product, request.type(), request.additionalContext());
-        String title = generateTitleFromType(request.type(), artisan, product);
+        String storyContent = aiContentService.generateCraftStory(artisan, product, request.storyType(), request.additionalContext());
+        String title = generateTitleFromType(request.storyType(), artisan, product);
 
         Story story = new Story();
-        story.setTitle(title);
+        story.setTittle(title);
         story.setContent(storyContent);
-        story.setType(request.type());
-        story.setArtisan(artisan);
+        story.setStoryType(request.storyType());
+        story.setArtisian(artisan);
         story.setProduct(product);
-        story.setIsAiGenerated(true);
-        story.setAiPromptUsed(String.format("Type: %s, Context: %s", request.type(), request.additionalContext()));
 
         Story saved = storyRepository.save(story);
         log.info("Generated story for artisan {}: {}", artisan.getName(), title);
 
-        return storyMapper(saved);
+        return objectMapper.storyMapper(saved);
     }
 
     public List<StoryResponse> getStoriesByArtisan(Long artisanId) {
         List<Story> stories = storyRepository.findByArtisanIdOrderByCreatedAtDesc(artisanId);
-        return stories.stream().map(ObjectMapper::storyMapper).collect(Collectors.toList());
+        return stories.stream().map(objectMapper::storyMapper).collect(Collectors.toList());
     }
 
-    private String generateTitleFromType(StoryType type, Artisian artisan, Product product) {
+    private String generateTitleFromType(StoryType type, Artisian artisian, Product product) {
         return switch (type) {
-            case CRAFT_ORIGIN -> String.format("The Origins of %s: A Traditional Craft", artisan.getSpecialization());
-            case TECHNIQUE -> String.format("Mastering the Art: %s Techniques", artisan.getSpecialization());
-            case CULTURAL_HERITAGE -> String.format("Cultural Heritage: The Story of %s Crafts", artisan.getLocation());
-            case PERSONAL_JOURNEY -> String.format("The Journey of %s: A Master Artisan", artisan.getName());
+            case CRAFT_ORIGIN -> String.format("The Origins of %s: A Traditional Craft", artisian.getSpecialization());
+            case TECHNIQUE -> String.format("Mastering the Art: %s Techniques", artisian.getSpecialization());
+            case CULTURAL_HERITAGE -> String.format("Cultural Heritage: The Story of %s Crafts", artisian.getLocation());
+            case PERSONAL_JOURNEY -> String.format("The Journey of %s: A Master Artisan", artisian.getName());
         };
     }
+
 }

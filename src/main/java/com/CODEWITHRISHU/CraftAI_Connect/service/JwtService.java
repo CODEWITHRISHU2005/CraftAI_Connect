@@ -1,5 +1,8 @@
 package com.CODEWITHRISHU.CraftAI_Connect.service;
 
+import com.CODEWITHRISHU.CraftAI_Connect.dto.Request.CreateArtisianRequest;
+import com.CODEWITHRISHU.CraftAI_Connect.entity.Address;
+import com.CODEWITHRISHU.CraftAI_Connect.entity.Artisian;
 import com.CODEWITHRISHU.CraftAI_Connect.entity.User;
 import com.CODEWITHRISHU.CraftAI_Connect.exception.UserAlreadyExists;
 import com.CODEWITHRISHU.CraftAI_Connect.repository.UserRepository;
@@ -28,7 +31,7 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     public String extractUsername(String token) {
@@ -93,23 +96,32 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public void addUser(RegisterRequest userInfo) {
-        log.info("Adding new user: {}", userInfo.getName());
-        if (repository.findByNameOrEmail(userInfo.getName(), userInfo.getEmail()).isPresent()) {
-            throw new UserAlreadyExists("User already exists with name: " + userInfo.getName());
+    public void addUser(CreateArtisianRequest userInfo) {
+        log.info("Adding new user: {}", userInfo.name());
+        if (userRepository.findByEmail(userInfo.email()).isPresent()) {
+            throw new UserAlreadyExists("User already exists with name: " + userInfo.name());
         }
-        userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
-        User user = User.builder()
-                .name(userInfo.getName())
-                .email(userInfo.getEmail())
-                .password(userInfo.getPassword())
-                .roles(userInfo.getRole())
-                .address(userInfo.getAddress())
-                .craftType(userInfo.getCraftType())
-                .experienceYears(userInfo.getExperienceYears())
-                .bio(userInfo.getBio())
+
+        User user = userRepository.findByEmail(userInfo.name()).get();
+        user.setPassword(passwordEncoder.encode(userInfo.password()));
+        Artisian artisian = Artisian.builder()
+                .name(userInfo.name())
+                .email(userInfo.email())
+                .password(userInfo.password())
+                .address(Address.builder()
+                        .street(userInfo.address().getStreet())
+                        .city(userInfo.address().getCity())
+                        .state(userInfo.address().getState())
+                        .country(userInfo.address().getCountry())
+                        .pinCode(userInfo.address().getPinCode())
+                        .phoneNumber(userInfo.address().getPhoneNumber())
+                        .build())
+                .craftSpecialty(userInfo.craftSpecialty())
+                .yearsOfExperience(userInfo.yearsOfExperience())
+                .bio(userInfo.bio())
                 .build();
-        repository.save(user);
-        log.info("User '{}' added successfully", userInfo.getName());
+
+        userRepository.save(artisian);
+        log.info("User '{}' added successfully", userInfo.name());
     }
 }

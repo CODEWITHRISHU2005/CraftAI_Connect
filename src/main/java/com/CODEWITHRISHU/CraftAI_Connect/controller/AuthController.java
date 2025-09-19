@@ -1,5 +1,7 @@
 package com.CODEWITHRISHU.CraftAI_Connect.controller;
 
+import com.CODEWITHRISHU.CraftAI_Connect.dto.Request.AuthRequest;
+import com.CODEWITHRISHU.CraftAI_Connect.dto.Request.CreateArtisianRequest;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.Request.RefreshTokenRequest;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.Response.JwtResponse;
 import com.CODEWITHRISHU.CraftAI_Connect.entity.RefreshToken;
@@ -22,39 +24,40 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/signIn")
-    public JwtResponse authenticateAndGetToken(@RequestBody LoginRequest authRequest) {
+    public JwtResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(authRequest.username(), authRequest.password())
         );
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(authRequest.getUsername());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(authRequest.username());
         return JwtResponse.builder()
-                .accessToken(jwtService.generateToken(authRequest.getUsername()))
+                .accessToken(jwtService.generateToken(authRequest.username()))
+                .refreshToken(refreshToken.getToken()).build();
+    }
+
+    @PostMapping("/signUp")
+    public JwtResponse registerAndGetAccessAndRefreshToken(@RequestBody CreateArtisianRequest request) {
+        jwtService.addUser(request);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.name());
+
+        return JwtResponse.builder()
+                .accessToken(jwtService.generateToken(request.name()))
                 .refreshToken(refreshToken.getToken()).build();
     }
 
     @PostMapping("/refreshToken")
     public JwtResponse getRefreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
-        return refreshTokenService.findByToken(refreshTokenRequest.getToken())
+        return refreshTokenService.findByToken(refreshTokenRequest.token())
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUserInfo)
                 .map(userInfo -> {
-                    String accessToken = jwtService.generateToken(userInfo.getName());
+                    String accessToken = jwtService.generateToken(userInfo.getUsername());
                     return JwtResponse.builder()
                             .accessToken(accessToken)
-                            .refreshToken(refreshTokenRequest.getToken())
+                            .refreshToken(refreshTokenRequest.token())
                             .build();
                 }).orElseThrow(() -> new RuntimeException(
                         "Refresh token is not in database!"));
     }
 
-    @PostMapping("/signUp")
-    public JwtResponse registerAndGetAccessAndRefreshToken(@RequestBody RegisterRequest request) {
-        jwtService.addUser(request);
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getName());
-
-        return JwtResponse.builder()
-                .accessToken(jwtService.generateToken(request.getName()))
-                .refreshToken(refreshToken.getToken()).build();
-    }
 }

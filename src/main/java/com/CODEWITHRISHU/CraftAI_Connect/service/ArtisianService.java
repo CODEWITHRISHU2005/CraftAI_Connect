@@ -4,16 +4,17 @@ import com.CODEWITHRISHU.CraftAI_Connect.Utils.ObjectMapper;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.ArtisianStatus;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.Request.CreateArtisianRequest;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.Response.ArtisianResponse;
+import com.CODEWITHRISHU.CraftAI_Connect.entity.Address;
 import com.CODEWITHRISHU.CraftAI_Connect.entity.Artisian;
+import com.CODEWITHRISHU.CraftAI_Connect.exception.UserAlreadyExists;
 import com.CODEWITHRISHU.CraftAI_Connect.repository.ArtisianRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import static com.CODEWITHRISHU.CraftAI_Connect.Utils.ObjectMapper.artisianMapper;
 
 @Service
 @Slf4j
@@ -21,38 +22,47 @@ import static com.CODEWITHRISHU.CraftAI_Connect.Utils.ObjectMapper.artisianMappe
 public class ArtisianService {
     private final AIContentService aiContentService;
     private final ArtisianRepository artisianRepository;
+    private final ObjectMapper objectMapper;
+    private final PasswordEncoder encoder;
 
     @Transactional
     public ArtisianResponse createArtisan(CreateArtisianRequest request) {
         if (artisianRepository.findByEmail(request.email()).isPresent()) {
-            throw new RuntimeException("Artisan with email " + request.email() + " already exists");
+            throw new UserAlreadyExists("Artisan with email " + request.email() + " already exists" + " try with different email");
         }
 
-        Artisian artisan = new Artisian();
-        artisan.setName(request.name());
-        artisan.setEmail(request.email());
-        artisan.setPhone(request.phone());
-        artisan.setLocation(request.location());
-        artisan.setSpecialization(request.specialization());
-        artisan.setBio(request.bio());
-        artisan.setYearsOfExperience(request.yearsOfExperience());
-        artisan.setStatus(ArtisianStatus.ACTIVE);
+        Artisian artisan = Artisian.builder()
+                .name(request.name())
+                .email(request.email())
+                .password(encoder.encode(request.password()))
+                .craftSpecialty(request.craftSpecialty())
+                .address(Address.builder()
+                        .street(request.address().getStreet())
+                        .city(request.address().getCity())
+                        .state(request.address().getState())
+                        .pinCode(request.address().getPinCode())
+                        .country(request.address().getCountry())
+                        .build())
+                .bio(request.bio())
+                .yearsOfExperience(request.yearsOfExperience())
+                .status(ArtisianStatus.ACTIVE)
+                .build();
 
         Artisian saved = artisianRepository.save(artisan);
         log.info("Created new artisan: {} with ID: {}", saved.getName(), saved.getId());
 
-        return artisianMapper(saved);
+        return objectMapper.artisianMapper(saved);
     }
 
     public Page<ArtisianResponse> searchArtisans(String query, String location, String specialization, Pageable pageable) {
         Page<Artisian> artisans = artisianRepository.findBySearchCriteria(query, location, specialization, pageable);
-        return artisans.map(ObjectMapper::artisianMapper);
+        return artisans.map(objectMapper::artisianMapper);
     }
 
     public ArtisianResponse getArtisanById(Long id) {
         Artisian artisan = artisianRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Artisan not found with ID: " + id));
-        return artisianMapper(artisan);
+        return objectMapper.artisianMapper(artisan);
     }
 
     @Transactional

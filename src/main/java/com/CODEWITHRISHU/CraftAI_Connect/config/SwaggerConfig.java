@@ -13,7 +13,7 @@ public class SwaggerConfig {
     public OpenAPI snapBuyOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("CraftAIConnect API")
+                        .title("CraftAIConnect APP")
                         .description("Backend REST API documentation for CraftAIConnect App")
                         .version("v1.0.0")
                         .contact(new Contact()
@@ -24,4 +24,5 @@ public class SwaggerConfig {
                                 .name("Apache 2.0")
                                 .url("http://springdoc.org")));
     }
+
 }

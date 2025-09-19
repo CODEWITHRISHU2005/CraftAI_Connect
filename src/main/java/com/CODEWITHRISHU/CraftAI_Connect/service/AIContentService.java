@@ -3,6 +3,7 @@ package com.CODEWITHRISHU.CraftAI_Connect.service;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.StoryType;
 import com.CODEWITHRISHU.CraftAI_Connect.entity.Artisian;
 import com.CODEWITHRISHU.CraftAI_Connect.entity.Product;
+import com.CODEWITHRISHU.CraftAI_Connect.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
@@ -11,8 +12,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AIContentService {
     private final ChatClient chatClient;
+    private final User user;
 
-    public AIContentService(ChatClient.Builder chatClientBuilder) {
+    public AIContentService(ChatClient.Builder chatClientBuilder, User user) {
+        this.user = user;
         this.chatClient = chatClientBuilder.build();
     }
 
@@ -50,11 +53,10 @@ public class AIContentService {
                         - Focus on the heritage and craftsmanship
                         """,
                 product.getName(),
-                product.getDescription() != null ? product.getDescription() : "No description provided",
-                product.getMaterials() != null ? product.getMaterials() : "Traditional materials",
-                product.getCategory() != null ? product.getCategory() : "Handcrafted item",
-                product.getArtisan().getSpecialization() != null ? product.getArtisan().getSpecialization() : "Traditional craft",
-                product.getArtisan().getLocation() != null ? product.getArtisan().getLocation() : "India"
+                product.getDescription(),
+                product.getMaterials(),
+                product.getCategory(),
+                user.getAddress().getStreet()
         );
 
         try {
@@ -68,7 +70,7 @@ public class AIContentService {
         }
     }
 
-    public String generateArtisanBio(Artisian artisan) {
+    public String generateArtisanBio(Artisian artisian) {
         String prompt = String.format("""
                         Create a compelling professional bio for an Indian artisan:
                         
@@ -85,11 +87,10 @@ public class AIContentService {
                         - Shows authenticity and dedication to craft
                         - Is professional yet personal
                         """,
-                artisan.getName(),
-                artisan.getSpecialization() != null ? artisan.getSpecialization() : "Traditional crafts",
-                artisan.getLocation() != null ? artisan.getLocation() : "India",
-                artisan.getYearsOfExperience() != null ? artisan.getYearsOfExperience() : 10,
-                artisan.getBio() != null ? artisan.getBio() : "No existing bio"
+                artisian.getName(),
+                user.getAddress().getCountry(),
+                artisian.getYearsOfExperience(),
+                artisian.getBio()
         );
 
         try {
@@ -98,15 +99,14 @@ public class AIContentService {
                     .call()
                     .content();
         } catch (Exception e) {
-            log.error("Error generating bio for artisan {}: {}", artisan.getId(), e.getMessage());
+            log.error("Error generating bio for artisan {}: {}", artisian.getId(), e.getMessage());
             return String.format("Meet %s, a skilled artisan specializing in %s with %d years of experience in preserving traditional craftsmanship.",
-                    artisan.getName(),
-                    artisan.getSpecialization() != null ? artisan.getSpecialization() : "traditional crafts",
-                    artisan.getYearsOfExperience() != null ? artisan.getYearsOfExperience() : 10);
+                    artisian.getName(),
+                    artisian.getYearsOfExperience());
         }
     }
 
-    private String buildStoryPrompt(Artisian artisan, Product product, StoryType type, String additionalContext) {
+    private String buildStoryPrompt(Artisian artisan, Product product, StoryType storyType, String additionalContext) {
         String basePrompt = String.format("""
                         Write a compelling story about an Indian artisan and their craft:
                         
@@ -120,15 +120,14 @@ public class AIContentService {
                         
                         """,
                 artisan.getName(),
-                artisan.getSpecialization() != null ? artisan.getSpecialization() : "Traditional crafts",
-                artisan.getLocation() != null ? artisan.getLocation() : "India",
-                artisan.getYearsOfExperience() != null ? artisan.getYearsOfExperience() : 10,
-                product != null ? product.getName() : "General craft",
-                type,
+                user.getAddress().getCountry(),
+                artisan.getYearsOfExperience(),
+                product.getName(),
+                storyType,
                 additionalContext != null ? additionalContext : "None"
         );
 
-        return switch (type) {
+        return switch (storyType) {
             case CRAFT_ORIGIN -> basePrompt + """
                     Focus on the historical origins and cultural significance of this craft.
                     Include traditional techniques passed down through generations.
@@ -152,18 +151,18 @@ public class AIContentService {
         };
     }
 
-    private String generateFallbackStory(Artisian artisan, Product product, StoryType type) {
+    private String generateFallbackStory(Artisian artisian, Product product, StoryType type) {
         return switch (type) {
             case CRAFT_ORIGIN ->
                     String.format("The art of %s has been practiced in %s for generations, passed down through families who have dedicated their lives to preserving this beautiful tradition.",
-                            artisan.getSpecialization(), artisan.getLocation());
+                            product.getName());
             case TECHNIQUE ->
-                    String.format("%s employs time-honored techniques that require years to master, combining skill, patience, and artistic vision.", artisan.getName());
+                    String.format("%s employs time-honored techniques that require years to master, combining skill, patience, and artistic vision.", artisian.getName());
             case CULTURAL_HERITAGE ->
-                    String.format("The craft represents the rich cultural heritage of %s, embodying traditions that connect communities to their roots.", artisan.getLocation());
+                    String.format("The craft represents the rich cultural heritage of %s, embodying traditions that connect communities to their roots.", user.getAddress().getStreet());
             case PERSONAL_JOURNEY ->
                     String.format("%s has dedicated %d years to perfecting their craft, driven by passion and commitment to preserving traditional arts.",
-                            artisan.getName(), artisan.getYearsOfExperience());
+                            artisian.getName(), artisian.getYearsOfExperience());
         };
     }
 }

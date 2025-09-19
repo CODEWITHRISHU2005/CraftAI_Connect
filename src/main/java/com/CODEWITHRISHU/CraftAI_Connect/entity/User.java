@@ -39,15 +39,24 @@ public class User extends AuditEntity {
     @Size(min = 6, max = 120)
     private String password;
 
-    @NotBlank
-    @Size(max = 50)
-    private String fullName;
+    @Column(columnDefinition = "TEXT")
+    private String craftSpecialty;
+
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
+    private Integer yearsOfExperience;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
-    private Role role = Role.CUSTOMER;
+    private Role role = Role.ARTISIAN;
 
     @Embedded
     @JsonIgnore
     private Address address;
+
+    @OneToMany(mappedBy = "artisan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Product> products = new ArrayList<>();
+
+    @OneToMany(mappedBy = "artisian", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Story> stories = new ArrayList<>();
 }

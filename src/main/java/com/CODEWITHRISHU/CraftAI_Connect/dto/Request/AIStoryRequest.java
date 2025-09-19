@@ -15,5 +15,6 @@ public class AIStoryRequest {
     private String materials;
     private String techniques;
     private String culturalSignificance;
-    private String tone = "engaging"; // engaging, formal, poetic
+    private String tone = "engaging"; // engaging, formal,
+
 }

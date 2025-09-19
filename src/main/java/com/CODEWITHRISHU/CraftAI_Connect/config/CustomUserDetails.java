@@ -1,23 +1,28 @@
 package com.CODEWITHRISHU.CraftAI_Connect.config;
 
 import com.CODEWITHRISHU.CraftAI_Connect.entity.User;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CustomUserDetails implements org.springframework.security.core.userdetails.UserDetails {
+@Getter
+public class CustomUserDetails implements UserDetails {
     private final String name;
     private final String password;
+    private final String email;
     private final List<GrantedAuthority> authorities;
 
     public CustomUserDetails(User userInfo) {
-        this.name = userInfo.getName();
+        this.name = userInfo.getUsername();
         this.password = userInfo.getPassword();
-        this.authorities = Arrays.stream(userInfo.getRoles().split(","))
+        this.email = userInfo.getEmail();
+        this.authorities = Arrays.stream(String.valueOf(userInfo.getRole()).split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
