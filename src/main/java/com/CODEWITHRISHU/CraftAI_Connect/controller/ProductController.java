@@ -45,7 +45,7 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<Page<ProductResponse>> searchProducts(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -57,7 +57,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProduct(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         ProductResponse product = productService.getProductById(id);
         return ResponseEntity.ok(product);
     }

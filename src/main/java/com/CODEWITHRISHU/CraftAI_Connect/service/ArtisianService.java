@@ -26,7 +26,8 @@ public class ArtisianService {
     private final PasswordEncoder encoder;
 
     @Transactional
-    public ArtisianResponse createArtisan(CreateArtisianRequest request) {
+    public ArtisianResponse addArtisian(CreateArtisianRequest request) {
+        log.info("Adding new artisian1: {}", request.name());
         if (artisianRepository.findByEmail(request.email()).isPresent()) {
             throw new UserAlreadyExists("Artisan with email " + request.email() + " already exists" + " try with different email");
         }
