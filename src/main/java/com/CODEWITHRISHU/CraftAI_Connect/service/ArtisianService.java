@@ -66,17 +66,17 @@ public class ArtisianService {
     }
 
     @Transactional
-    public void enhanceArtisanProfile(Long artisanId) {
-        Artisian artisan = artisianRepository.findById(artisanId)
-                .orElseThrow(() -> new RuntimeException("Artisan not found"));
+    public void enhanceArtisanProfile(Long artisianId) {
+        Artisian artisian = artisianRepository.findById(artisianId)
+                .orElseThrow(() -> new RuntimeException("Artisan not found with ID: " + artisianId));
 
-        if (artisan.getBio() == null || artisan.getBio().length() < 100) {
-            String enhancedBio = aiContentService.generateArtisanBio(artisan);
-            artisan.setBio(enhancedBio);
-            log.info("Enhanced bio for artisan: {}", artisan.getName());
+        if (artisian.getBio() == null || artisian.getBio().length() < 100) {
+            String enhancedBio = aiContentService.generateArtisanBio(artisian);
+            artisian.setBio(enhancedBio);
+            log.info("Enhanced bio for artisian: {}", artisian.getName());
         }
 
-        artisan.getProducts().forEach(product -> {
+        artisian.getProducts().forEach(product -> {
             if (product.getAiGeneratedDescription() == null) {
                 String enhancedDescription = aiContentService.enhanceProductDescription(product);
                 product.setAiGeneratedDescription(enhancedDescription);
@@ -84,6 +84,6 @@ public class ArtisianService {
             }
         });
 
-        artisianRepository.save(artisan);
+        artisianRepository.save(artisian);
     }
 }

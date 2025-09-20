@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 public class ProductController {
     private final ProductService productService;
 
-    @PostMapping
+    @PostMapping("/artisan/{artisanId}")
     public ResponseEntity<ProductResponse> createProduct(
             @PathVariable Long artisanId,
             @Valid @RequestBody CreateProductRequest request) {
