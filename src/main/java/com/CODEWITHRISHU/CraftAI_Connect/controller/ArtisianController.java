@@ -25,6 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/artisans")
 @Validated
+@CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class ArtisianController {
     private final JwtService jwtService;
@@ -33,17 +34,17 @@ public class ArtisianController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/signUp")
-    public ArtisianResponse registerAndGetAccessAndRefreshToken(@Valid @RequestBody CreateArtisianRequest request) {
+    public JwtResponse registerAndGetAccessAndRefreshToken(@Valid @RequestBody CreateArtisianRequest request) {
         artisianService.addArtisian(request);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.name());
 
-        return ArtisianResponse.builder()
+        return JwtResponse.builder()
                 .accessToken(jwtService.generateToken(request.name()))
                 .refreshToken(refreshToken.getToken()).build();
     }
 
     @PostMapping("/signIn")
-    public JwtResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+    public JwtResponse authenticateAndGetToken(@Valid @RequestBody AuthRequest authRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.username(), authRequest.password())
         );

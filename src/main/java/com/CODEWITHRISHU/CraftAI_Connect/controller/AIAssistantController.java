@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/AI")
 @Slf4j
+@CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class AIAssistantController {
 

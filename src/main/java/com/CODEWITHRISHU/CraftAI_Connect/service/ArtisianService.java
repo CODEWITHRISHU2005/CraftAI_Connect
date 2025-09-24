@@ -26,7 +26,7 @@ public class ArtisianService {
     private final PasswordEncoder encoder;
 
     @Transactional
-    public ArtisianResponse addArtisian(CreateArtisianRequest request) {
+    public void addArtisian(CreateArtisianRequest request) {
         log.info("Adding new artisian1: {}", request.name());
         if (artisianRepository.findByEmail(request.email()).isPresent()) {
             throw new UserAlreadyExists("Artisan with email " + request.email() + " already exists" + " try with different email");
@@ -51,8 +51,6 @@ public class ArtisianService {
 
         Artisian saved = artisianRepository.save(artisan);
         log.info("Created new artisan: {} with ID: {}", saved.getName(), saved.getId());
-
-        return objectMapper.artisianMapper(saved);
     }
 
     public Page<ArtisianResponse> searchArtisans(String query, String location, String craftSpeciality, Pageable pageable) {

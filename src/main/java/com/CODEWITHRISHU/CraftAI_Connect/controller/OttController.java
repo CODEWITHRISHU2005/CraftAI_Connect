@@ -4,13 +4,11 @@ import com.CODEWITHRISHU.CraftAI_Connect.dto.Response.JwtResponse;
 import com.CODEWITHRISHU.CraftAI_Connect.service.OttService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/v1/ott")
 public class OttController {
 
@@ -27,4 +25,5 @@ public class OttController {
         JwtResponse response = ottService.loginWithOttToken(token);
         return ResponseEntity.ok(response);
     }
+
 }

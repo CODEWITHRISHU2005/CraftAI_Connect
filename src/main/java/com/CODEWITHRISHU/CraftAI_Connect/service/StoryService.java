@@ -1,6 +1,5 @@
 package com.CODEWITHRISHU.CraftAI_Connect.service;
 
-import com.CODEWITHRISHU.CraftAI_Connect.utils.ObjectMapper;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.Request.GenerateStoryRequest;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.Response.StoryResponse;
 import com.CODEWITHRISHU.CraftAI_Connect.dto.StoryType;
@@ -10,6 +9,7 @@ import com.CODEWITHRISHU.CraftAI_Connect.entity.Story;
 import com.CODEWITHRISHU.CraftAI_Connect.repository.ArtisianRepository;
 import com.CODEWITHRISHU.CraftAI_Connect.repository.ProductRepository;
 import com.CODEWITHRISHU.CraftAI_Connect.repository.StoryRepository;
+import com.CODEWITHRISHU.CraftAI_Connect.utils.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @Service
 @Slf4j
@@ -43,12 +42,13 @@ public class StoryService {
         String storyContent = aiContentService.generateCraftStory(artisan, product, request.storyType(), request.additionalContext());
         String title = generateTitleFromType(request.storyType(), artisan);
 
-        Story story = new Story();
-        story.setTittle(title);
-        story.setContent(storyContent);
-        story.setStoryType(request.storyType());
-        story.setArtisian(artisan);
-        story.setProduct(product);
+        Story story = Story.builder()
+                .tittle(title)
+                .content(storyContent)
+                .storyType(request.storyType())
+                .artisian(artisan)
+                .product(product)
+                .build();
 
         Story saved = storyRepository.save(story);
         log.info("Generated story for artisan {}: {}", artisan.getName(), title);

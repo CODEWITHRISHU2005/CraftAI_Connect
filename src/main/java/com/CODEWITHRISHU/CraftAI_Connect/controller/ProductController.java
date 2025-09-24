@@ -16,8 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 
 @RestController
-@RequestMapping("/api/v1/products")
+@RequestMapping("/api/products")
 @Slf4j
+@CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
